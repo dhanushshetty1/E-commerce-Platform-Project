@@ -1,0 +1,28 @@
+package com.shetty.ecommerce.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.shetty.ecommerce.Entities.Manager;
+import com.shetty.ecommerce.dao.ManagerRepository;
+
+@Service
+public class ManagerService {
+	@Autowired
+	private ManagerRepository managerRepository;
+
+	public List<Manager> getAllEmployee(){
+		
+		Iterable<Manager> iterable = managerRepository.findAll();
+		
+		List<Manager> list = (List<Manager>)iterable;
+		return list;
+	}
+	
+	public Manager addEmployee(Manager emp) {
+		managerRepository.save(emp);
+		return emp;
+	}
+}

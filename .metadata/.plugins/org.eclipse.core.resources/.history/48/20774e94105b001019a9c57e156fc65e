@@ -1,0 +1,9 @@
+package com.shetty.ecommerce.dao;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.shetty.ecommerce.Entities.Manager;
+
+public interface ProductRepository extends JpaRepository<Manager, Long>{
+
+}
