@@ -1,0 +1,5 @@
+package com.shetty.ecommerce.dao;
+
+public interface ReviewRepository {
+
+}

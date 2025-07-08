@@ -1,0 +1,18 @@
+package com.shetty.ecommerce.controller;
+
+import com.shetty.ecommerce.Entities.Payment;
+import com.shetty.ecommerce.service.PaymentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class PaymentController {
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @PostMapping("/payment/{orderId}")
+    public Payment makePayment(@PathVariable Long orderId) {
+        return paymentService.processPayment(orderId);
+    }
+}

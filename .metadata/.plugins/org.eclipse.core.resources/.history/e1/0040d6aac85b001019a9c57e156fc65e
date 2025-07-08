@@ -1,0 +1,46 @@
+package com.shetty.ecommerce.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.shetty.ecommerce.Entities.Product;
+import com.shetty.ecommerce.dao.ProductRepository;
+
+@Service
+public class ProductService {
+	
+	@Autowired
+	private ProductRepository productReposotory;
+
+	public List<Product> getAllProducts() {
+		Iterable<Product> iterable= productReposotory.findAll();
+	    List<Product> list = (List<Product>)iterable;
+	    return list;
+	}
+
+	public Product getProductById(Long id) {
+		Product student=null;
+		Optional<Product> optional=productReposotory.findById(id);
+		student=optional.get();
+		return student;
+	}
+
+	public Product addProduct(Product product) {
+		Product p = productReposotory.save(product);
+		return p;
+	}
+	
+	public Product updateProduct(Long id, Product product) {
+		product.setId(id);
+		return productReposotory.save(product);
+	}
+
+	public void deleteProduct(Long id) {
+		productReposotory.deleteById(id);
+		
+	}
+
+}

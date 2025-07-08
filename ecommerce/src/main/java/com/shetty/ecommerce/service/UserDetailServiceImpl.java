@@ -8,25 +8,34 @@ import org.springframework.stereotype.Service;
 
 import com.shetty.ecommerce.Entities.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
-public class UserDetailServiceImpl implements UserDetailsService{
-	 @Autowired
-	    private UserService userService;
+public class UserDetailServiceImpl implements UserDetailsService {
 
-	    @Override
-	    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-	        User user = userService.findUser(username);
+    private static final Logger logger = LoggerFactory.getLogger(UserDetailServiceImpl.class);
 
-	        if (user == null) {
-	            throw new UsernameNotFoundException("Username not found: " + username);
-	        }
+    @Autowired
+    private UserService userService;
 
-	        return new org.springframework.security.core.userdetails.User(
-	        	    user.getEmail(),
-	        	    user.getPassword(),
-	        	    user.getRoles()/*.stream()
-	        	        .map(role -> new SimpleGrantedAuthority(role.getName()))
-	        	        .collect(Collectors.toList())*/
-	        	);
-	    }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        logger.info("🔐 Attempting to load user by username: {}", username);
+
+        User user = userService.findUser(username);
+
+        if (user == null) {
+            logger.error("❌ Username not found: {}", username);
+            throw new UsernameNotFoundException("Username not found: " + username);
+        }
+
+        logger.info("✅ User found: {}", username);
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                user.getRoles()
+        );
+    }
 }

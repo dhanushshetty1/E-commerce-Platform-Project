@@ -1,0 +1,51 @@
+package com.shetty.ecommerce.service;
+
+import com.shetty.ecommerce.Entities.Order;
+import com.shetty.ecommerce.dao.OrderRepository;
+import com.shetty.ecommerce.dao.ProductRepository;
+import com.shetty.ecommerce.dao.UserRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class OrderService {
+
+    @Autowired
+    private OrderRepository orderRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
+    public Order getOrderById(Long id) {
+        return orderRepository.findById(id).orElse(null);
+    }
+
+    public Order placeOrder(Order order) {
+        order.setUser(userRepository.findById(order.getUser().getId()).orElse(null));
+
+        order.setProducts(order.getProducts().stream()
+            .map(p -> productRepository.findById(p.getId()).orElse(null))
+            .toList());
+
+        order.setTotalAmount(order.getProducts().stream().mapToDouble(Product::getPrice).sum());
+
+        return orderRepository.save(order);
+    }
+
+    public void deleteOrder(Long id) {
+        orderRepository.deleteById(id);
+    }
+    
+    
+}

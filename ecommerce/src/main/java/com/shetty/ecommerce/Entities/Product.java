@@ -7,7 +7,19 @@ import jakarta.persistence.Id;
 
 @Entity
 public class Product {
+	
+	private double discount;  // discount in percentage, e.g., 10 for 10%
+	
+	
 
+	public double getDiscount() {
+		return discount;
+	}
+	public void setDiscount(double discount) {
+		this.discount = discount;
+	}
+	
+	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

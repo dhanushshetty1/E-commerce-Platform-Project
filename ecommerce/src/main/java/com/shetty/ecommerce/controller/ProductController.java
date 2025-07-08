@@ -2,6 +2,7 @@ package com.shetty.ecommerce.controller;
 
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,35 +15,45 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shetty.ecommerce.Entities.Product;
 import com.shetty.ecommerce.service.ProductService;
 
+import org.slf4j.Logger;
+
 @RestController
 public class ProductController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 	
 	@Autowired
     private ProductService productService;
 
     @GetMapping("/products")
     public List<Product> getAllProducts() {
+    	 logger.info("👤 User is fetching all products");
         return this.productService.getAllProducts();
     }
 
     @GetMapping("product/{id}")
     public Product getProductById(@PathVariable Long id) {
+    	logger.info("👤 User is fetching a product");
         return this.productService.getProductById(id);
     }
 
     @PostMapping("/product")
     public Product addProduct(@RequestBody Product product) {
+    	logger.info("📝 Admin is adding a new product: {}", product.getName());
         return this.productService.addProduct(product);
     }
 
     @PutMapping("/product/{id}")
     public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
+    	logger.info("📝 Admin is updating a product: {}", product.getName());
         return this.productService.updateProduct(id, product);
     }
 
     @DeleteMapping("/product/{id}")
     public String deleteProduct(@PathVariable Long id) {
+    	logger.warn("⚠️ Admin is deleting product with ID: {}", id);
         this.productService.deleteProduct(id);
         return "Product deleted successfully";
+        
     }
 }

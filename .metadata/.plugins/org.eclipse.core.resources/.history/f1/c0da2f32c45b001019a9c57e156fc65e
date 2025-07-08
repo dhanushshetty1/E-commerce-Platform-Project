@@ -1,0 +1,27 @@
+package com.shetty.ecommerce.controller;
+
+import com.shetty.ecommerce.Entities.Review;
+import com.shetty.ecommerce.dao.ReviewRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+public class ReviewController {
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @PostMapping("/reviews")
+    public Review addReview(@RequestBody Review review) {
+        return reviewRepository.save(review);
+    }
+
+    @GetMapping("/reviews/product/{productId}")
+    public List<Review> getReviewsByProduct(@PathVariable Long productId) {
+        return reviewRepository.findAll().stream()
+                .filter(r -> r.getProduct().getId().equals(productId))
+                .toList();
+    }
+}

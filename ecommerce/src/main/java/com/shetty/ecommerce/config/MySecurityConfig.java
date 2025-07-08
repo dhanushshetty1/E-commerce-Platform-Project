@@ -25,8 +25,20 @@ public class MySecurityConfig {
 				.hasAnyRole("USER","ADMIN")
 				.requestMatchers(HttpMethod.POST,"/product")
 				.hasRole("ADMIN")
+				.requestMatchers(HttpMethod.GET, "/api/orders/**")
+				.hasAnyRole("USER", "ADMIN") 
+			    .requestMatchers(HttpMethod.POST, "/api/orders")
+			    .hasAnyRole("USER", "ADMIN")
+			    .requestMatchers(HttpMethod.POST, "/payment/**")
+			    .hasAnyRole("USER", "ADMIN")
+			    .requestMatchers(HttpMethod.POST, "/reviews/**")
+			    .hasAnyRole("USER", "ADMIN")
+			    .requestMatchers(HttpMethod.GET, "/reviews/product/{productId}/**")
+			    .hasAnyRole("USER", "ADMIN")
+			    
 				);
 		
+	
 		http.csrf(csrf->csrf.disable());
 		//http.authorizeHttpRequests().anyRequest().authenticated();
 		return http.build();

@@ -1,0 +1,33 @@
+package com.shetty.ecommerce.service;
+
+import com.shetty.ecommerce.Entities.Order;
+import com.shetty.ecommerce.Entities.Payment;
+import com.shetty.ecommerce.dao.OrderRepository;
+import com.shetty.ecommerce.dao.PaymentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+@Service
+public class PaymentService {
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    public Payment processPayment(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) return null;
+
+        Payment payment = new Payment();
+        payment.setOrder(order);
+        payment.setAmount(order.getTotalAmount());
+        payment.setStatus("SUCCESS");  // Simulate successful payment
+        payment.setPaymentDate(LocalDateTime.now());
+
+        return paymentRepository.save(payment);
+    }
+}
