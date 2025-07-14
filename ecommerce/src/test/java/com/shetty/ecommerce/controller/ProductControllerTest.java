@@ -1,0 +1,115 @@
+package com.shetty.ecommerce.controller;
+
+import com.shetty.ecommerce.Entities.Product;
+import com.shetty.ecommerce.service.ProductService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
+
+@WebMvcTest(ProductController.class)
+class ProductControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private ProductService productService;
+
+    private Product mockProduct;
+
+    @BeforeEach
+    void setUp() {
+        mockProduct = new Product();
+        mockProduct.setId(1L);
+        mockProduct.setName("Laptop");
+        mockProduct.setPrice(50000);
+    }
+
+    @WithMockUser(roles = {"USER"})
+    @Test
+    void testGetAllProducts() throws Exception {
+        when(productService.getAllProducts()).thenReturn(List.of(mockProduct));
+
+        mockMvc.perform(get("/products"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Laptop"));
+    }
+
+    @WithMockUser(roles = {"USER"})
+    @Test
+    void testGetProductById() throws Exception {
+        when(productService.getProductById(1L)).thenReturn(mockProduct);
+
+        mockMvc.perform(get("/product/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Laptop"));
+    }
+
+    @WithMockUser(roles = {"ADMIN"})
+    @Test
+    void testAddProduct() throws Exception {
+        when(productService.addProduct(any(Product.class))).thenReturn(mockProduct);
+
+        String productJson = """
+            {
+                "name": "Laptop",
+                "price": 50000
+            }
+        """;
+
+        mockMvc.perform(post("/product")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productJson)
+                .with(csrf()))  // CSRF for POST
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Laptop"));
+    }
+
+    @WithMockUser(roles = {"ADMIN"})
+    @Test
+    void testUpdateProduct() throws Exception {
+        when(productService.updateProduct(anyLong(), any(Product.class))).thenReturn(mockProduct);
+
+        String updatedJson = """
+            {
+                "name": "Laptop Pro",
+                "price": 55000
+            }
+        """;
+
+        mockMvc.perform(put("/product/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedJson)
+                .with(csrf()))  // CSRF for PUT
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Laptop"));
+    }
+
+    @WithMockUser(roles = {"ADMIN"})
+    @Test
+    void testDeleteProduct() throws Exception {
+        Mockito.doNothing().when(productService).deleteProduct(1L);
+
+        mockMvc.perform(delete("/product/1").with(csrf()))  // CSRF for DELETE
+                .andExpect(status().isOk());
+    }
+}

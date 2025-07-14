@@ -1,0 +1,79 @@
+package com.shetty.ecommerce.controller;
+
+import com.shetty.ecommerce.Entities.Order;
+import com.shetty.ecommerce.service.OrderService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+class OrderControllerTest {
+
+    @Mock
+    private OrderService orderService;
+
+    @InjectMocks
+    private OrderController orderController;
+
+    private Order sampleOrder;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+     
+        sampleOrder = new Order();
+        sampleOrder.setId(1L);
+        sampleOrder.setTotalAmount(1000.0);
+    }
+
+    @Test
+    void testGetAllOrders() {
+        List<Order> orders = Arrays.asList(sampleOrder);
+        when(orderService.getAllOrders()).thenReturn(orders);
+
+        List<Order> result = orderController.getAllOrders();
+
+        assertEquals(1, result.size());
+        verify(orderService, times(1)).getAllOrders();
+    }
+
+    @Test
+    void testGetOrderById() {
+        when(orderService.getOrderById(1L)).thenReturn(sampleOrder);
+
+        Order result = orderController.getOrderById(1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        verify(orderService, times(1)).getOrderById(1L);
+    }
+
+    @Test
+    void testPlaceOrder() {
+        when(orderService.placeOrder(sampleOrder)).thenReturn(sampleOrder);
+
+        Order result = orderController.placeOrder(sampleOrder);
+
+        assertNotNull(result);
+        assertEquals(1000.0, result.getTotalAmount());
+        verify(orderService, times(1)).placeOrder(sampleOrder);
+    }
+
+    @Test
+    void testDeleteOrder() {
+        doNothing().when(orderService).deleteOrder(1L);
+
+        String response = orderController.deleteOrder(1L);
+
+        assertEquals("Order deleted successfully", response);
+        verify(orderService, times(1)).deleteOrder(1L);
+    }
+}

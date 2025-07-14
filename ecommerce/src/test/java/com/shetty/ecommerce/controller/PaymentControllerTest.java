@@ -1,0 +1,58 @@
+package com.shetty.ecommerce.controller;
+
+import com.shetty.ecommerce.Entities.Payment;
+import com.shetty.ecommerce.service.PaymentService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import org.springframework.http.MediaType;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
+@WebMvcTest(PaymentController.class)
+class PaymentControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private PaymentService paymentService;
+
+    private Payment mockPayment;
+
+    @BeforeEach
+    void setUp() {
+        mockPayment = new Payment();
+        mockPayment.setId(1L);
+        mockPayment.setAmount(500.0);
+        mockPayment.setStatus("SUCCESS");
+    }
+
+
+    @WithMockUser(username = "testuser", roles = {"USER"}) 
+    @Test
+    void testMakePayment() throws Exception {
+        when(paymentService.processPayment(anyLong())).thenReturn(mockPayment);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/payment/1").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.amount").value(500.0))
+                .andExpect(jsonPath("$.status").value("SUCCESS"));
+    }
+}

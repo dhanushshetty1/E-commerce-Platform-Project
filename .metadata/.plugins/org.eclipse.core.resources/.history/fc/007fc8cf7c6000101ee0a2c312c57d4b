@@ -1,0 +1,58 @@
+package com.shetty.ecommerce.service;
+
+import com.shetty.ecommerce.Entities.User;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class UserDetailServiceImplTest {
+
+
+    @Mock
+    private UserService userService;
+
+    @InjectMocks
+    private UserDetailServiceImpl userDetailService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void loadUserByUsername_success() {
+        // Arrange
+        User mockUser = new User();
+        mockUser.setEmail("test@example.com");
+        mockUser.setPassword("password123");
+        mockUser.setRoles(Collections.emptyList());
+
+        when(userService.findUser("test@example.com")).thenReturn(mockUser);
+
+        // Act
+        UserDetails userDetails = userDetailService.loadUserByUsername("test@example.com");
+
+        // Assert
+        assertNotNull(userDetails);
+        assertEquals("test@example.com", userDetails.getUsername());
+        assertEquals("password123", userDetails.getPassword());
+    }
+
+    @Test
+    void loadUserByUsername_notFound() {
+        when(userService.findUser("unknown@example.com")).thenReturn(null);
+
+        assertThrows(UsernameNotFoundException.class, () ->
+                userDetailService.loadUserByUsername("unknown@example.com"));
+    }
+}
